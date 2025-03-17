@@ -473,7 +473,7 @@ if __name__ == "__main__":
         num_transactions=5000,
         start_date=datetime.date(2023, 3, 1),
         end_date=datetime.date(2023, 3, 31),
-        output_path="../data/transactions_march_2023.csv",
+        output_path="data/transactions_march_2023.csv",
         format="csv"
     )
     
@@ -507,5 +507,5 @@ if __name__ == "__main__":
         }
     ]
     
-    batch_results = generator.generate_batch(batch_config, "../data/batches/")
+    batch_results = generator.generate_batch(batch_config, "data/batches/")
     print(f"Generated {len(batch_results)} batches of data")

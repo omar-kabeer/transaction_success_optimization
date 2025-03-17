@@ -6,6 +6,7 @@ import datetime
 import random
 import os
 from scipy import stats
+from collections import defaultdict
 
 class TransactionDataGenerator:
     """
@@ -82,6 +83,29 @@ class TransactionDataGenerator:
             'valentines_day': {'start_date': datetime.date(2023, 2, 14), 'end_date': datetime.date(2023, 2, 14), 
                              'volume_factor': 1.3, 'failure_factor': 1.0}
         }
+        
+        # Customer data
+        self.customer_ids = [f'CUST{str(i).zfill(6)}' for i in range(1, 1001)]
+        
+        
+        # Customer locations with their probabilities
+        self.customer_locations = {
+            'urban': 0.65,
+            'suburban': 0.25,
+            'rural': 0.10
+        }
+
+        # Device types with their probabilities
+        self.device_types = {
+            'mobile': 0.55,
+            'web': 0.30,
+            'pos': 0.10,
+            'atm': 0.05
+        }
+
+        # Track customer-merchant relationships for consistent data
+        self.customer_merchants = defaultdict(list)
+        
         
         # User-defined events (like outages)
         self.custom_events = []
@@ -297,6 +321,91 @@ class TransactionDataGenerator:
             
         return total_transactions
     
+    def _select_customer_id(self, merchant_id):
+        """Select or assign a customer ID, maintaining customer-merchant relationships."""
+        # 80% chance of returning a repeat customer if they exist
+        if merchant_id in self.customer_merchants and random.random() < 0.8:
+            return random.choice(self.customer_merchants[merchant_id])
+        
+        # New customer
+        customer_id = random.choice(self.customer_ids)
+        # Add to merchant's customer list
+        self.customer_merchants[merchant_id].append(customer_id)
+        return customer_id
+
+    def _select_customer_location(self):
+        """Select customer location based on defined probabilities."""
+        locations, probabilities = zip(*[(loc, prob) for loc, prob in self.customer_locations.items()])
+        return np.random.choice(locations, p=probabilities)
+
+    def _select_device_type(self, payment_method):
+        """Select device type based on payment method and probability."""
+        # Adjust probabilities based on payment method
+        if payment_method == 'mobile_money':
+            weights = {'mobile': 0.85, 'web': 0.15, 'pos': 0.00, 'atm': 0.00}
+        elif payment_method == 'USSD':
+            weights = {'mobile': 0.95, 'web': 0.05, 'pos': 0.00, 'atm': 0.00}
+        elif payment_method == 'credit_card' or payment_method == 'debit_card':
+            weights = {'mobile': 0.40, 'web': 0.35, 'pos': 0.20, 'atm': 0.05}
+        else:  # bank_transfer
+            weights = {'mobile': 0.30, 'web': 0.60, 'pos': 0.00, 'atm': 0.10}
+        
+        devices = list(weights.keys())
+        probabilities = list(weights.values())
+        
+        return np.random.choice(devices, p=probabilities)
+
+    def _generate_network_latency(self, device_type, customer_location):
+        """Generate realistic network latency based on device and location."""
+        # Base latency parameters
+        base_shape = 2.0
+        
+        # Scale based on device type
+        device_scales = {
+            'mobile': 1.2,
+            'web': 1.0,
+            'pos': 0.8,
+            'atm': 0.7
+        }
+        
+        # Scale based on location
+        location_scales = {
+            'urban': 0.8,
+            'suburban': 1.2,
+            'rural': 1.8
+        }
+        
+        # Calculate final scale
+        final_scale = 50 * device_scales[device_type] * location_scales[customer_location]
+        
+        # Generate latency value
+        latency = np.random.gamma(shape=base_shape, scale=final_scale)
+        
+        return round(latency, 2)
+
+    def _determine_retry_count(self, result, payment_method, network_latency):
+        """Determine number of retries based on transaction characteristics."""
+        # Base probabilities
+        base_probs = [0.8, 0.1, 0.05, 0.03, 0.02]  # For 0,1,2,3,4 retries
+        
+        # No retries on success
+        if result == "success":
+            return 0
+        
+        # Adjust probabilities based on payment method and latency
+        if payment_method in ['mobile_money', 'USSD']:
+            # Higher chance of retries
+            probs = [0.6, 0.2, 0.1, 0.06, 0.04]
+        else:
+            probs = base_probs
+        
+        # Further adjust based on latency
+        if network_latency > 200:  # Very high latency
+            # Even higher chance of retries
+            probs = [0.5, 0.2, 0.15, 0.1, 0.05]
+        
+        return np.random.choice([0, 1, 2, 3, 4], p=probs)
+    
     def generate_transactions(self, num_transactions=1000, start_date=None, end_date=None, output_path=None, format='csv'):
         """
         Generate synthetic transaction data.
@@ -344,13 +453,26 @@ class TransactionDataGenerator:
             
             # Select processor
             processor_id = self._select_processor(payment_method)
-# Initialize transaction record
+            
+            # Select customer
+            customer_id = self._select_customer_id(merchant_id)
+            customer_location = self._select_customer_location()
+            device_type = self._select_device_type(payment_method)
+                        
+            # Generate network metrics
+            network_latency = self._generate_network_latency(device_type, customer_location)
+
+            # Initialize transaction record
             transaction = {
                 'transaction_id': transaction_id,
                 'timestamp': timestamp,
                 'merchant_id': merchant_id,
+                'customer_id': customer_id,
+                'customer_location': customer_location,
                 'payment_amount': payment_amount,
                 'payment_method': payment_method,
+                'device_type': device_type,
+                'network_latency': network_latency,
                 'result': result,
                 'processor_id': processor_id,
                 'time_of_day': timestamp.strftime('%H:%M'),
@@ -358,12 +480,16 @@ class TransactionDataGenerator:
                 'error_code': None,
                 'failure_reason': None
             }
-            
+
             # Add error details if transaction failed
             if result == 'failure':
                 error_code = self._select_error_code(payment_method)
                 transaction['error_code'] = error_code
                 transaction['failure_reason'] = self.error_codes[error_code]
+                # Determine retry count based on failure
+                transaction['retry_count'] = self._determine_retry_count(result, payment_method, network_latency)
+            else:
+                transaction['retry_count'] = 0
             
             # Check if transaction falls within a regional event
             for event_name, event_data in self.regional_events.items():

@@ -3,3 +3,5 @@ data
 *.csv
 *.parquet
 *.docx
+.ipynb_checkpoints
+.venv

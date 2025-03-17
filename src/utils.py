@@ -1,4 +1,4 @@
-from dependencies import * 
+from src.dependencies import * 
 # Set plotting style
 plt.style.use('seaborn-v0_8-whitegrid')
 sns.set_palette('viridis')

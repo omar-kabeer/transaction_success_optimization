@@ -1,8 +1,14 @@
 pandas
 numpy
+matplotlib
+seaborn
+scipy
 scikit-learn
 xgboost
 flask
 fastapi
 uvicorn
 streamlit
+missingno
+shap
+lime

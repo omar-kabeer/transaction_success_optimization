@@ -16,13 +16,13 @@ def plot_missing_values(df):
         Input dataframe
     """
     print(f"Missing values count:\n{df.isnull().sum()}")
-    print(f"\nMissing values percentage:\n{df.isnull().sum() / len(df) * 100:.2f}%")
-    
+    print(f"\nMissing values percentage:\n{(df.isnull().sum() / len(df) * 100).round(2)}%")  # FIXED
+
     plt.figure(figsize=(12, 6))
     msno.matrix(df)
     plt.title('Missing Values Matrix')
     plt.show()
-    
+
     plt.figure(figsize=(12, 6))
     msno.bar(df)
     plt.title('Missing Values Bar Chart')

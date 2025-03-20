@@ -31,11 +31,13 @@ sns.set(style="whitegrid")
 # ==========================
 from sklearn.model_selection import (train_test_split, cross_val_score, 
                                      KFold, StratifiedKFold, GridSearchCV)
+from imblearn.over_sampling import SMOTE
 from sklearn.preprocessing import (StandardScaler, MinMaxScaler, 
                                    OneHotEncoder, LabelEncoder)
 from sklearn.impute import SimpleImputer, KNNImputer
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
+from sklearn.utils.class_weight import compute_class_weight
 from sklearn.feature_selection import RFE
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression

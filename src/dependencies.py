@@ -13,7 +13,7 @@ import pandas as pd
 from collections import defaultdict
 from faker import Faker
 from scipy import stats
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ==========================
 # Visualization Libraries
@@ -52,6 +52,8 @@ from sklearn.metrics import (confusion_matrix, precision_recall_curve,
 # ==========================
 import statsmodels.api as sm
 from statsmodels.tsa.seasonal import seasonal_decompose
+# Multi-Armed Bandit implementation
+from scipy import stats
 
 # ==========================
 # Advanced Machine Learning
@@ -66,6 +68,21 @@ import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
+from tqdm import tqdm   
+
+
+# ==========================
+# Reinforcement Learning
+# ==========================
+
+import gym
+from gym import spaces
+import stable_baselines3
+from stable_baselines3 import PPO, DQN
+from stable_baselines3.common.vec_env import DummyVecEnv
+from stable_baselines3.common.evaluation import evaluate_policy
+from stable_baselines3.common.env_checker import check_env
+
 
 # ==========================
 # Model Interpretability
@@ -76,12 +93,21 @@ import shap
 # Warnings Configuration
 # ==========================
 from sklearn.exceptions import ConvergenceWarning
+from tqdm import TqdmWarning
 
+# Suppress TqdmWarning
+warnings.simplefilter("ignore", category=TqdmWarning)
+
+# Suppress warnings
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+# ==========================
+# Pandas Configuration
+# ==========================
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)

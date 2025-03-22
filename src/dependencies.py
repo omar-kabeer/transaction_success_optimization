@@ -7,6 +7,7 @@ import uuid
 import random
 import warnings
 import joblib
+import pickle
 import datetime
 import numpy as np
 import pandas as pd
@@ -14,6 +15,12 @@ from collections import defaultdict
 from faker import Faker
 from scipy import stats
 from datetime import datetime, timedelta
+import logging
+import requests
+import json
+import concurrent.futures
+from collections import Counter
+from collections import defaultdict
 
 # ==========================
 # Visualization Libraries
@@ -112,3 +119,14 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
+
+# ==========================
+# FastAPI Libraries
+# ==========================
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
+from typing import Optional, List, Dict, Any
+import uvicorn
+import boto3

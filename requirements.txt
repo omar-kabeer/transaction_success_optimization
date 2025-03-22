@@ -1,14 +1,65 @@
+# Standard library dependencies
+# (included in Python, but listed for clarity)
+# os
+# time
+# uuid
+# random
+# warnings
+# datetime
+# json
+# collections
+# logging
+# concurrent.futures
+
+# Data manipulation and analysis
 pandas
 numpy
-matplotlib
-seaborn
 scipy
+
+# Machine learning
 scikit-learn
 xgboost
+imbalanced-learn
+statsmodels
+optuna
+
+# Deep learning
+tensorflow
+
+# Reinforcement learning
+gym
+stable-baselines3
+
+# Web frameworks
 flask
 fastapi
 uvicorn
 streamlit
-missingno
+
+# Model persistence
+joblib
+pickle
+
+# Data validation
+pydantic
+
+# AWS integration
+boto3
+
+# HTTP requests
+requests
+
+# Visualization
+matplotlib
+seaborn
+tqdm
+
+# Model interpretation
 shap
 lime
+
+# Data quality
+missingno
+
+# Testing and development
+faker

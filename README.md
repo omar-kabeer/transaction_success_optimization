@@ -25,27 +25,51 @@ transaction_success_optimization/
 ├── app/                     # API and deployment files
 │   ├── app.py               # FastAPI application
 │   ├── deploy_to_aws.py     # AWS ECS deployment script
-│   └── monitoring.py        # API and model monitoring
+│   ├── monitoring.py        # API and model monitoring
+│   └── static/              # Static assets for the API
+│       ├── favicon.ico      # Favicon for the API
+│       └── site.webmanifest # Web app manifest
 ├── configs/                 # Configuration files
+│   └── config.yaml          # Main configuration parameters
 ├── dashboards/              # Interactive analysis dashboards
+│   └── home.py              # Main Streamlit dashboard
 ├── data/                    # Transaction datasets
 │   ├── batches/             # Batch prediction datasets
+│   │   ├── holiday_week.parquet  # Holiday period transactions
+│   │   └── normal_week.csv       # Normal period transactions
 │   ├── processed/           # Processed feature data
+│   │   ├── full_feature_engineered_data.csv  # Data with all features
+│   │   └── processed_transaction_data.csv    # Cleaned transaction data
 │   └── raw/                 # Original transaction data
+│       ├── batches/         # Raw batch data
+│       └── transactions_march_2023.csv  # Raw transaction data
 ├── models/                  # Trained models and pipelines
+│   ├── feature_engineering_pipeline.pkl  # Feature preprocessing pipeline
+│   ├── model_metadata.json              # Model performance metrics
+│   ├── Optimized XGBoost_model_20250320.joblib  # Optimized model
+│   ├── Optimized XGBoost.pkl           # Latest optimized model
+│   ├── rl_agent.pth                    # Reinforcement learning agent
+│   └── XGBoost_model_20250320.joblib   # Base XGBoost model
 ├── notebooks/               # Development and analysis notebooks
+│   ├── 01_data_exploration.ipynb       # Initial data analysis
+│   ├── 02_feature_engineering.ipynb    # Feature development notebook
+│   ├── 03_model_training_and_evaluation.ipynb  # Model training notebook
+│   ├── 05_deployment_and_integration.ipynb     # Deployment notebook
+│   └── imgs/                # Notebook images and diagrams
 ├── reports/                 # Generated reports and evaluations
+│   └── overview.pdf         # Project overview document
 ├── src/                     # Source code
 │   ├── data_generator.py    # Synthetic data generation
-│   ├── data_preprocessing.py # Data cleaning and preparation
 │   ├── dependencies.py      # Project dependencies
 │   ├── feature_engineering.py # Feature creation and transformation
-│   ├── model_evaluation.py  # Performance metrics and testing
 │   ├── model_retraining.py  # Continuous model improvement
-│   ├── model_training.py    # Model training pipeline
-│   ├── real_time_inference.py # Fast prediction service
 │   └── utils.py             # Utility functions
-└── tests/                   # Test suite
+├── tests/                   # Test suite
+│   ├── ab_testing.py        # A/B testing framework
+│   └── test_app.py          # API tests
+├── requirements.txt         # Project dependencies
+├── setup.py                 # Package installation configuration
+└── README.md                # Project documentation
 ```
 
 ## ⚙️ Installation and Setup

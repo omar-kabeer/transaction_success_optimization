@@ -1,9 +1,87 @@
-data:
-  raw: "data/raw/transactions.csv"
-  processed: "data/processed/cleaned_transactions.csv"
+# ===================================
+# Transaction Success Optimization
+# Configuration File
+# ===================================
 
-model:
-  type: "XGBoost"
-  parameters:
-    max_depth: 5
-    learning_rate: 0.01
+# General configuration
+general:
+  project_name: "Transaction Success Optimization"
+  version: "1.0.0"
+  seed: 42
+  log_level: "INFO"
+  environment: "development"  # Options: development, staging, production
+
+# Data paths and settings
+data:
+  # Raw data paths
+  raw:
+    main_file: "data/raw/transactions_march_2023.csv"
+    batch_dir: "data/raw/batches/"
+    
+  # Processed data paths
+  processed:
+    main_file: "data/processed/processed_transaction_data.csv"
+    feature_engineered: "data/processed/full_feature_engineered_data.csv"
+    
+  # Data processing settings
+  processing:
+    train_test_split: 0.2
+    validation_split: 0.1
+    random_state: 42
+    feature_selection_method: "importance"  # Options: rfe, importance, correlation
+    outlier_detection: "iqr"  # Options: iqr, z-score, isolation_forest
+    missing_value_strategy: "mean"  # Options: mean, median, knn, zero
+
+# Model configurations
+models:
+  # XGBoost model
+  xgboost:
+    base_model:
+      max_depth: 5
+      learning_rate: 0.01
+      n_estimators: 100
+      subsample: 0.8
+      colsample_bytree: 0.8
+      objective: "binary:logistic"
+      eval_metric: "auc"
+      use_label_encoder: false
+      verbosity: 1
+    
+  # Feature engineering pipeline
+  feature_engineering:
+    pipeline_path: "models/feature_engineering_pipeline.pkl"
+    categorical_features:
+      - "payment_method"
+      - "device_type"
+    numerical_features:
+      - "payment_amount"
+      - "transaction_time"
+    scaling_method: "standard"  # Options: standard, minmax, robust
+    encoding_method: "onehot"  # Options: onehot, label, target
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: true
+  workers: 2
+  timeout: 30
+  model_path: "models/Optimized XGBoost.pkl"
+  endpoints:
+    prediction: "/predict"
+    health: "/health"
+
+# Monitoring and evaluation
+monitoring:
+  performance_tracking:
+    log_predictions: true
+    metrics:
+      - "accuracy"
+      - "f1"
+      - "precision"
+      - "recall"
+  
+# Business metrics and thresholds
+business_metrics:
+  success_rate_target: 0.95
+  average_response_time_target: 0.5  # seconds

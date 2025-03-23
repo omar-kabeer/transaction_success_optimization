@@ -116,3 +116,98 @@ def plot_correlation_matrix(df, figsize=(20, 16)):
     plt.show()
     
     return corr
+
+# Define a function to evaluate models
+def evaluate_model(model, X_train, X_test, y_train, y_test, model_name):
+    # Fit the model
+    start_time = time.time()
+    model.fit(X_train, y_train)
+    train_time = time.time() - start_time
+    
+    # Make predictions
+    y_pred = model.predict(X_test)
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    
+    # Calculate metrics
+    accuracy = accuracy_score(y_test, y_pred)
+    precision = precision_score(y_test, y_pred)
+    recall = recall_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred)
+    roc_auc = roc_auc_score(y_test, y_pred_proba)
+    
+    # Print metrics
+    print(f"\n{model_name} Performance:")
+    print(f"Training time: {train_time:.2f} seconds")
+    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall: {recall:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+    print(f"ROC AUC: {roc_auc:.4f}")
+    
+    # Create and plot confusion matrix
+    plt.figure(figsize=(8, 6))
+    cm = confusion_matrix(y_test, y_pred)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                xticklabels=['Failure', 'Success'],
+                yticklabels=['Failure', 'Success'])
+    plt.xlabel('Predicted')
+    plt.ylabel('Actual')
+    plt.title(f'Confusion Matrix - {model_name}')
+    plt.show()
+    
+    # Plot ROC Curve
+    plt.figure(figsize=(8, 6))
+    fpr, tpr, _ = roc_curve(y_test, y_pred_proba)
+    plt.plot(fpr, tpr, color='blue', lw=2, label=f'ROC curve (area = {roc_auc:.4f})')
+    plt.plot([0, 1], [0, 1], color='gray', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title(f'ROC Curve - {model_name}')
+    plt.legend(loc="lower right")
+    plt.grid(alpha=0.3)
+    plt.show()
+    
+    # Plot Precision-Recall curve
+    plt.figure(figsize=(8, 6))
+    precision_curve, recall_curve, _ = precision_recall_curve(y_test, y_pred_proba)
+    plt.plot(recall_curve, precision_curve, color='blue', lw=2)
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title(f'Precision-Recall Curve - {model_name}')
+    plt.grid(alpha=0.3)
+    plt.show()
+    
+    # Return results for comparison
+    return {
+        'model': model,
+        'model_name': model_name,
+        'accuracy': accuracy,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1,
+        'roc_auc': roc_auc,
+        'train_time': train_time,
+        'y_pred_proba': y_pred_proba
+    }
+    
+    
+    
+def create_nn_model(input_dim, activation=None, optimizer=None, loss=None, metrics=None, output_activation=None):
+    model = Sequential([
+        Dense(64, activation=activation, input_dim=input_dim),
+        Dropout(0.3),
+        Dense(32, activation=activation),
+        Dropout(0.2),
+        Dense(16, activation=activation),
+        Dense(1, output_activation=output_activation)
+    ])
+    
+    model.compile(
+        optimizer=optimizer,
+        loss=loss,
+        metrics=metrics
+    )
+    
+    return model
